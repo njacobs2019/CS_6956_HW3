@@ -84,7 +84,7 @@ def save_image(tensor, filepath, nrow=8):
     plt.figure(figsize=(10, 10))
     plt.imshow(grid.cpu().numpy().transpose((1, 2, 0)))
     plt.axis("off")
-    plt.savefig(filepath)
+    plt.savefig(filepath, bbox_inches="tight")
     plt.close()
 
 
