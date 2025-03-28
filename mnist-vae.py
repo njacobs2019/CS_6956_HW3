@@ -77,7 +77,11 @@ if __name__ == "__main__":
             experiment_config=comet_ml.ExperimentConfig(
                 auto_metric_logging=False,
                 disabled=False,
-                name=f"{'Conv' if args.use_conv else ''}VAE-latent{args.latent_dim}-hidden{args.hidden_dim}",
+                name=(
+                    f"{'Conv' if args.use_conv else ''}"
+                    f"VAE-latent{args.latent_dim}-"
+                    f"hidden{args.hidden_dim}"
+                ),
             ),
         )
 
