@@ -19,7 +19,6 @@ class ConditionalVAE(nn.Module):
         self.fc2 = nn.Linear(latent_dim + condition_dim, hidden_dim)
         self.fc3 = nn.Linear(hidden_dim, input_dim)
 
-
     def encode(self, x, c):
         # Flatten the input
         x = x.view(-1, self.input_dim)
@@ -40,7 +39,7 @@ class ConditionalVAE(nn.Module):
         # Concatenate latent and condition
         z = torch.cat([z, c], dim=1)
         h = F.relu(self.fc2(z))
-        return torch.sigmoid(self.fc3(h)) # Sigmoid to output probabilities for binary data
+        return torch.sigmoid(self.fc3(h))  # Sigmoid to output probabilities for binary data
 
     def forward(self, x, c):
         # Encode
@@ -54,6 +53,7 @@ class ConditionalVAE(nn.Module):
 
         return x_recon, mu, logvar
 
+
 class ConvolutionalVAE(nn.Module):
     def __init__(self, condition_dim=10, hidden_dim=256, latent_dim=2):
         super(ConvolutionalVAE, self).__init__()
@@ -66,7 +66,7 @@ class ConvolutionalVAE(nn.Module):
             nn.ReLU(),
             nn.Conv2d(32, 64, kernel_size=3, stride=2, padding=1),  # 7x7
             nn.ReLU(),
-            nn.Flatten()
+            nn.Flatten(),
         )
 
         # output size after convolutions
@@ -84,12 +84,15 @@ class ConvolutionalVAE(nn.Module):
 
         self.decoder_conv = nn.Sequential(
             nn.Unflatten(1, (64, 7, 7)),
-            nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, output_padding=1), #14x14
+            nn.ConvTranspose2d(
+                64, 32, kernel_size=3, stride=2, padding=1, output_padding=1
+            ),  # 14x14
             nn.ReLU(),
-            nn.ConvTranspose2d(32, 1, kernel_size=3, stride=2, padding=1, output_padding=1), #28x28
-            nn.Sigmoid()
+            nn.ConvTranspose2d(
+                32, 1, kernel_size=3, stride=2, padding=1, output_padding=1
+            ),  # 28x28
+            nn.Sigmoid(),
         )
-
 
     def encode(self, x, c):
         # Process image through convolutions
@@ -126,8 +129,7 @@ class ConvolutionalVAE(nn.Module):
         h = F.relu(self.fc_decoder(z))
 
         # Process through deconvolutions
-        return self.decoder_conv(h.view(-1, 64, 7, 7)) # Output size is 1 channel, 28x28 image
-
+        return self.decoder_conv(h.view(-1, 64, 7, 7))  # Output size is 1 channel, 28x28 image
 
     def forward(self, x, c):
         # Encode
