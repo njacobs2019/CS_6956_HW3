@@ -197,12 +197,14 @@ def visualize_latent_space(
             labels.append(label.numpy())
 
         # Concatenate all batches
-        z_points = np.concatenate(z_points, axis=0)
+        z_points_full = np.concatenate(z_points, axis=0)
         labels = np.concatenate(labels, axis=0)
 
         # Plot latent space
         plt.figure(figsize=(10, 8))
-        scatter = plt.scatter(z_points[:, 0], z_points[:, 1], c=labels, cmap="tab10", alpha=0.6)
+        scatter = plt.scatter(
+            z_points_full[:, 0], z_points_full[:, 1], c=labels, cmap="tab10", alpha=0.6
+        )
         plt.colorbar(scatter, label="Digit")
         plt.title("Latent Space Visualization")
         plt.xlabel("z[0]")
