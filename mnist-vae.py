@@ -48,7 +48,7 @@ if __name__ == "__main__":
     parser.add_argument("--latent-dim", type=int, default=2, help="Dimension of latent space")
     parser.add_argument("--hidden-dim", type=int, default=512, help="Dimension of hidden layers")
     parser.add_argument("--batch-size", type=int, default=128, help="Batch size for training")
-    parser.add_argument("--epochs", type=int, default=20, help="Number of epochs to train")
+    parser.add_argument("--epochs", type=int, default=15, help="Number of epochs to train")
     parser.add_argument("--lr", type=float, default=1e-3, help="Learning rate")
     parser.add_argument("--use-conv", action="store_true", help="Use convolutional architecture")
 
@@ -73,22 +73,22 @@ if __name__ == "__main__":
 
     # Initialize Comet experiment
     experiment = None
-    if COMET_API_KEY:
-        experiment = comet_ml.start(
-            api_key=COMET_API_KEY,
-            project_name="pdl-hw3",
-            mode="create",
-            online=True,
-            experiment_config=comet_ml.ExperimentConfig(
-                auto_metric_logging=False,
-                disabled=False,
-                name=(
-                    f"{'Conv' if args.use_conv else ''}"
-                    f"VAE-latent{args.latent_dim}-"
-                    f"hidden{args.hidden_dim}"
-                ),
-            ),
-        )
+    # if COMET_API_KEY:
+    #     experiment = comet_ml.start(
+    #         api_key=COMET_API_KEY,
+    #         project_name="pdl-hw3",
+    #         mode="create",
+    #         online=True,
+    #         experiment_config=comet_ml.ExperimentConfig(
+    #             auto_metric_logging=False,
+    #             disabled=True,
+    #             name=(
+    #                 f"{'Conv' if args.use_conv else ''}"
+    #                 f"VAE-latent{args.latent_dim}-"
+    #                 f"hidden{args.hidden_dim}"
+    #             ),
+    #         ),
+    #     )
 
     # Train the model
     train_vae(
