@@ -1,0 +1,59 @@
+[tool.mypy]
+disable_error_code = ["import-untyped"]
+
+[tool.ruff]
+line-length = 88
+indent-width = 4
+respect-gitignore = true
+exclude = [
+    ".git"
+]
+target-version = "py312"
+
+[tool.ruff.lint]
+# Enable specific rules
+select = [
+    "E",  # Pycodestyle errors
+    "W",  # Pycodestyle warnings
+    "F",  # pyflakes
+    "I",   # Import checks
+    "ERA", # eradicate (commented-out code)
+    
+    "S", # flake8-bandit
+    "BLE", # flake8-blind-except
+    "A", # flake8-builtins
+    "COM818", # trailing-comma-on-bare-tuple
+    "C4", # flake8-comprehensions
+    "DTZ", # flake8-datetimez
+    "T10", # flake8-debugger
+    "EM", # flake8-errmsg
+    "FIX", # flake8-fixme
+    "ISC", # flake8-implicit-str-concat
+    "ICN", # flake8-import-conventions
+    "LOG", # flake8-logging
+    "G", # flake8-logging-format
+    "INP", # flake8-no-pep420
+    "PIE", # flake8-pie
+    "PYI", # flake8-pyi
+    "PT", # flake8-pytest-style
+    "RET", # flake8-return
+    "SLF", # flake8-self
+    "SIM", # flake8-simplify
+    "SLOT", # flake8-slots
+    "ARG", # flake8-unused-arguments
+
+    "FLY", # flynt
+    "C90",  # mccabe
+    "NPY", # numpy-specific rules
+    "PD", # pandas-vet
+    "PERF", # perflint (for performance)
+
+    "PTH", # flake8-use-pathlib
+
+# "ANN", # force type annotations
+# "N", # pep8-naming
+# "D", # pydocstyle
+# "DOC", # pydoclint
+]
+
+ignore = ["S101", "NPY002"]

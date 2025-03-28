@@ -1,0 +1,19 @@
+# Core dependencies
+torch==2.6.0
+torchvision==0.21.0
+numpy==2.2.3
+scipy==1.15.2
+pandas==2.2.3
+matplotlib==3.10.0
+tqdm==4.67.1
+comet_ml==3.49.3
+optuna==4.2.1
+optuna-dashboard==0.17.0
+python-dotenv==1.0.1
+
+# Developer utils
+ruff
+mypy
+pre-commit
+nbstripout
+
