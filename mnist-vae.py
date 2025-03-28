@@ -19,7 +19,7 @@ def vae_loss_function(
 ) -> Tensor:
     # Binary Cross Entropy loss
     # for binary data (e.g., MNIST images)
-    BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784), reduction="mean")
+    BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784), reduction="sum")
 
     # KL Divergence
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
@@ -48,7 +48,7 @@ if __name__ == "__main__":
     parser.add_argument("--latent-dim", type=int, default=2, help="Dimension of latent space")
     parser.add_argument("--hidden-dim", type=int, default=512, help="Dimension of hidden layers")
     parser.add_argument("--batch-size", type=int, default=128, help="Batch size for training")
-    parser.add_argument("--epochs", type=int, default=15, help="Number of epochs to train")
+    parser.add_argument("--epochs", type=int, default=20, help="Number of epochs to train")
     parser.add_argument("--lr", type=float, default=1e-3, help="Learning rate")
     parser.add_argument("--use-conv", action="store_true", help="Use convolutional architecture")
 
