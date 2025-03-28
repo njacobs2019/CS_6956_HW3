@@ -11,7 +11,7 @@ class ConditionalVAE(nn.Module):
         hidden_dim: int = 512,
         latent_dim: int = 2,
     ) -> None:
-        super(ConditionalVAE, self).__init__()
+        super().__init__()
         self.input_dim = input_dim
         self.latent_dim = latent_dim
         self.condition_dim = condition_dim
@@ -62,7 +62,7 @@ class ConditionalVAE(nn.Module):
 
 class ConvolutionalVAE(nn.Module):
     def __init__(self, condition_dim: int = 10, hidden_dim: int = 256, latent_dim: int = 2) -> None:
-        super(ConvolutionalVAE, self).__init__()
+        super().__init__()
         self.latent_dim = latent_dim
         self.condition_dim = condition_dim
 

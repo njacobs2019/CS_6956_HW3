@@ -1,5 +1,4 @@
 import os
-from typing import Optional
 
 import comet_ml
 import torch
@@ -16,7 +15,7 @@ COMET_API_KEY = os.getenv("COMET_API_KEY")
 
 
 def vae_loss_function(
-    recon_x: Tensor, x: Tensor, mu: Tensor, logvar: Tensor, beta: Optional[float] = 1.0
+    recon_x: Tensor, x: Tensor, mu: Tensor, logvar: Tensor, beta: float | None = 1.0
 ) -> tuple[Tensor, Tensor, Tensor]:
     # Binary Cross Entropy loss
     # for binary data (e.g., MNIST images)
@@ -30,7 +29,7 @@ def vae_loss_function(
 
 
 def conv_vae_loss_function(
-    recon_x: Tensor, x: Tensor, mu: Tensor, logvar: Tensor, beta: Optional[float] = 1.0
+    recon_x: Tensor, x: Tensor, mu: Tensor, logvar: Tensor, beta: float | None = 1.0
 ) -> tuple[Tensor, Tensor, Tensor]:
     # Binary Cross Entropy loss
     BCE = F.binary_cross_entropy(recon_x, x, reduction="mean")

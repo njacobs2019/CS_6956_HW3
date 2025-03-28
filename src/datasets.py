@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable, Literal, Optional
+from typing import Any, Literal
 
 import numpy as np
 import torch
@@ -65,7 +66,7 @@ class ConditionalMNIST(Dataset):
         self,
         root: str = "./mnist-data",
         train: bool = True,
-        transform: Optional[Callable] = None,
+        transform: Callable | None = None,
         download: bool = True,
     ) -> None:
         if download and Path(root).exists():

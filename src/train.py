@@ -1,6 +1,6 @@
 import time
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, Optional
 
 import torch
 from comet_ml import Experiment
@@ -20,7 +20,7 @@ def train_epoch(
     optimizer: Optimizer,
     device: torch.device,
     loss_fn: VaeLossFunctionType,
-    experiment: Optional[Experiment] = None,
+    experiment: Experiment | None = None,
     step: int = 0,
     use_conv: bool = False,
     log_every: int = 10,
@@ -108,7 +108,7 @@ def train_vae(
     loss_fn: VaeLossFunctionType,
     epochs: int = 20,
     lr: float = 1e-3,
-    experiment: Optional[Experiment] = None,
+    experiment: Experiment | None = None,
     checkpoint_name: str = "sample_model",
     log_every: int = 10,  # Log every `log_every` batches
 ) -> nn.Module:
