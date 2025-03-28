@@ -1,10 +1,12 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
+from torch import Tensor, nn
+from torch.utils.data import DataLoader
 from torchvision.utils import make_grid
 
 
-def save_model(model, optimizer, epoch, loss, filepath):
+def save_model(model: nn.Module, optimizer, epoch: float, loss: float, filepath: str):
     torch.save(
         {
             "epoch": epoch,
@@ -17,7 +19,7 @@ def save_model(model, optimizer, epoch, loss, filepath):
     print(f"Model saved to {filepath}")
 
 
-def load_model(model, optimizer, filepath, device):
+def load_model(model: nn.Module, optimizer, filepath: str, device: torch.device):
     checkpoint = torch.load(filepath, map_location=device)
     model.load_state_dict(checkpoint["model_state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
@@ -26,7 +28,13 @@ def load_model(model, optimizer, filepath, device):
     return model, optimizer, epoch, loss
 
 
-def save_reconstructions(model, dataloader, device, filepath, use_conv=False):
+def save_reconstructions(
+    model: nn.Module,
+    dataloader: DataLoader,
+    device: torch.device,
+    filepath: str,
+    use_conv: bool = False,
+):
     model.eval()
     with torch.no_grad():
         # Get a batch of data
@@ -50,7 +58,13 @@ def save_reconstructions(model, dataloader, device, filepath, use_conv=False):
 
 
 def save_samples(
-    model, device, filepath, num_samples=64, latent_dim=2, condition_dim=10, use_conv=False
+    model: nn.Module,
+    device: torch.device,
+    filepath: str,
+    num_samples: int = 64,
+    latent_dim: int = 2,
+    condition_dim: int = 10,
+    use_conv: bool = False,
 ):
     model.eval()
     with torch.no_grad():
@@ -79,7 +93,7 @@ def save_samples(
         print(f"Samples saved to {filepath}")
 
 
-def save_image(tensor, filepath, nrow=8):
+def save_image(tensor: Tensor, filepath: str, nrow: int = 8):
     grid = make_grid(tensor, nrow=nrow, padding=2, normalize=True)
     plt.figure(figsize=(10, 10))
     plt.imshow(grid.cpu().numpy().transpose((1, 2, 0)))
@@ -89,7 +103,13 @@ def save_image(tensor, filepath, nrow=8):
 
 
 def interpolate_latent_space(
-    model, device, filepath, start_digit=1, end_digit=7, steps=10, use_conv=False
+    model: nn.Module,
+    device: torch.device,
+    filepath: str,
+    start_digit: int = 1,
+    end_digit: int = 7,
+    steps=10,
+    use_conv=False,
 ):
     model.eval()
     with torch.no_grad():

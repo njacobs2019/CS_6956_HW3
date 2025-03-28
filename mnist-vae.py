@@ -4,6 +4,7 @@ import comet_ml
 import torch
 import torch.nn.functional as F
 from dotenv import load_dotenv
+from torch import Tensor
 
 from src.datasets import get_dataloaders
 from src.models import ConditionalVAE, ConvolutionalVAE
@@ -13,10 +14,12 @@ load_dotenv()
 COMET_API_KEY = os.getenv("COMET_API_KEY")
 
 
-def vae_loss_function(recon_x, x, mu, logvar, beta=1.0):
+def vae_loss_function(
+    recon_x: Tensor, x: Tensor, mu: Tensor, logvar: Tensor, beta: float = 1.0
+) -> Tensor:
     # Binary Cross Entropy loss
     # for binary data (e.g., MNIST images)
-    BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784), reduction="sum")
+    BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784), reduction="mean")
 
     # KL Divergence
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
@@ -25,9 +28,11 @@ def vae_loss_function(recon_x, x, mu, logvar, beta=1.0):
     return BCE + beta * KLD, BCE, KLD
 
 
-def conv_vae_loss_function(recon_x, x, mu, logvar, beta=1.0):
+def conv_vae_loss_function(
+    recon_x: Tensor, x: Tensor, mu: Tensor, logvar: Tensor, beta: float = 1.0
+) -> Tensor:
     # Binary Cross Entropy loss
-    BCE = F.binary_cross_entropy(recon_x, x, reduction="sum")
+    BCE = F.binary_cross_entropy(recon_x, x, reduction="mean")
 
     # KL Divergence
     KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
