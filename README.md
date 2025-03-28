@@ -1,10 +1,7 @@
 **Creating the environment**
 ```
-conda env create -f environment.yml
-```
-
-**Installing pre-commit hooks**
-```
+conda create --name PDL_HW3 python=3.13
+pip install -r requirements.txt
 pre-commit install
 ```
 
