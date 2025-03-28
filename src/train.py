@@ -8,7 +8,17 @@ from torch.optim.lr_scheduler import StepLR
 from .utils import save_model, save_reconstructions
 
 
-def train_epoch(model, train_loader, optimizer, device, loss_fn, experiment=None, step=0, use_conv=False, log_every = 10):
+def train_epoch(
+    model,
+    train_loader,
+    optimizer,
+    device,
+    loss_fn,
+    experiment=None,
+    step=0,
+    use_conv=False,
+    log_every=10,
+):
     model.train()
     train_loss = 0
     train_bce = 0
@@ -43,6 +53,7 @@ def train_epoch(model, train_loader, optimizer, device, loss_fn, experiment=None
         train_kld / len(train_loader.dataset),
         step,  # Return the current step for logging
     )
+
 
 def test_epoch(model, test_loader, device, loss_fn, experiment, epoch, use_conv=False):
     model.eval()

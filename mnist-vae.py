@@ -56,16 +56,11 @@ if __name__ == "__main__":
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if args.use_conv:
         model = ConvolutionalVAE(
-            condition_dim=10,
-            hidden_dim=args.hidden_dim,
-            latent_dim=args.latent_dim
+            condition_dim=10, hidden_dim=args.hidden_dim, latent_dim=args.latent_dim
         ).to(device)
     else:
         model = ConditionalVAE(
-            input_dim=784,
-            condition_dim=10,
-            hidden_dim=args.hidden_dim,
-            latent_dim=args.latent_dim
+            input_dim=784, condition_dim=10, hidden_dim=args.hidden_dim, latent_dim=args.latent_dim
         ).to(device)
 
     # loss function based on model type
@@ -96,6 +91,6 @@ if __name__ == "__main__":
         epochs=args.epochs,
         lr=args.lr,
         experiment=experiment,
-        checkpoint_name = f"mnist_{'conv' if args.use_conv else ''}latent{args.latent_dim}_hidden{args.hidden_dim}",  # noqa: E501
-        log_every=10  # comet log every 10 batches
+        checkpoint_name=f"mnist_{'conv' if args.use_conv else ''}latent{args.latent_dim}_hidden{args.hidden_dim}",  # noqa: E501
+        log_every=10,  # comet log every 10 batches
     )
