@@ -34,8 +34,7 @@ class ConditionalVAE(nn.Module):
     def reparameterize(self, mu, logvar):
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
-        z = mu + eps * std
-        return z
+        return mu + eps * std
 
     def decode(self, z, c):
         # Concatenate latent and condition
@@ -85,9 +84,9 @@ class ConvolutionalVAE(nn.Module):
 
         self.decoder_conv = nn.Sequential(
             nn.Unflatten(1, (64, 7, 7)),
-            nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, output_padding=1),  # 14x14
+            nn.ConvTranspose2d(64, 32, kernel_size=3, stride=2, padding=1, output_padding=1), #14x14
             nn.ReLU(),
-            nn.ConvTranspose2d(32, 1, kernel_size=3, stride=2, padding=1, output_padding=1),  # 28x28
+            nn.ConvTranspose2d(32, 1, kernel_size=3, stride=2, padding=1, output_padding=1), #28x28
             nn.Sigmoid()
         )
 
@@ -114,8 +113,7 @@ class ConvolutionalVAE(nn.Module):
     def reparameterize(self, mu, logvar):
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
-        z = mu + eps * std
-        return z
+        return mu + eps * std
 
     def decode(self, z, c):
         # Embed condition
