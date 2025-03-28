@@ -142,7 +142,8 @@ def visualize_latent_space(model, dataloader, device, filepath, use_conv=False):
         # Only visualize if latent space is 2D
         if model.latent_dim != 2:
             print(
-                f"Latent space visualization only supported for 2D latent space, got {model.latent_dim}D"
+                "Latent space visualization only supported for 2D latent space, "
+                f"got {model.latent_dim}D"
             )
             return
 
