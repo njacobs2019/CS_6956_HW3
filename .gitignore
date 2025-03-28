@@ -2,5 +2,6 @@ __pycache__
 .conda_env
 .mypy_cache
 .ruff_cache
-checkpoints
+checkpoints/
+mnist-data/
 .vscode
