@@ -2,11 +2,14 @@ import matplotlib.pyplot as plt
 import numpy as np
 import torch
 from torch import Tensor, nn
+from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 from torchvision.utils import make_grid
 
 
-def save_model(model: nn.Module, optimizer, epoch: float, loss: float, filepath: str):
+def save_model(
+    model: nn.Module, optimizer: Optimizer, epoch: float, loss: float, filepath: str
+) -> None:
     torch.save(
         {
             "epoch": epoch,
@@ -19,7 +22,9 @@ def save_model(model: nn.Module, optimizer, epoch: float, loss: float, filepath:
     print(f"Model saved to {filepath}")
 
 
-def load_model(model: nn.Module, optimizer, filepath: str, device: torch.device):
+def load_model(
+    model: nn.Module, optimizer: Optimizer, filepath: str, device: torch.device
+) -> tuple[nn.Module, Optimizer, int, float]:
     checkpoint = torch.load(filepath, map_location=device)
     model.load_state_dict(checkpoint["model_state_dict"])
     optimizer.load_state_dict(checkpoint["optimizer_state_dict"])
@@ -34,7 +39,7 @@ def save_reconstructions(
     device: torch.device,
     filepath: str,
     use_conv: bool = False,
-):
+) -> None:
     model.eval()
     with torch.no_grad():
         # Get a batch of data
@@ -65,7 +70,7 @@ def save_samples(
     latent_dim: int = 2,
     condition_dim: int = 10,
     use_conv: bool = False,
-):
+) -> None:
     model.eval()
     with torch.no_grad():
         # Create one-hot encoded conditions for each digit
@@ -93,7 +98,7 @@ def save_samples(
         print(f"Samples saved to {filepath}")
 
 
-def save_image(tensor: Tensor, filepath: str, nrow: int = 8):
+def save_image(tensor: Tensor, filepath: str, nrow: int = 8) -> None:
     grid = make_grid(tensor, nrow=nrow, padding=2, normalize=True)
     plt.figure(figsize=(10, 10))
     plt.imshow(grid.cpu().numpy().transpose((1, 2, 0)))
@@ -108,9 +113,9 @@ def interpolate_latent_space(
     filepath: str,
     start_digit: int = 1,
     end_digit: int = 7,
-    steps=10,
-    use_conv=False,
-):
+    steps: int = 10,
+    use_conv: bool = False,
+) -> None:
     model.eval()
     with torch.no_grad():
         # Create conditions for start and end digits
@@ -156,7 +161,13 @@ def interpolate_latent_space(
         print(f"Interpolations saved to {filepath}")
 
 
-def visualize_latent_space(model, dataloader, device, filepath, use_conv=False):
+def visualize_latent_space(
+    model: nn.Module,
+    dataloader: DataLoader,
+    device: torch.device,
+    filepath: str,
+    use_conv: bool = False,
+) -> None:
     model.eval()
     with torch.no_grad():
         # Only visualize if latent space is 2D
@@ -186,12 +197,14 @@ def visualize_latent_space(model, dataloader, device, filepath, use_conv=False):
             labels.append(label.numpy())
 
         # Concatenate all batches
-        z_points = np.concatenate(z_points, axis=0)
+        z_points_full = np.concatenate(z_points, axis=0)
         labels = np.concatenate(labels, axis=0)
 
         # Plot latent space
         plt.figure(figsize=(10, 8))
-        scatter = plt.scatter(z_points[:, 0], z_points[:, 1], c=labels, cmap="tab10", alpha=0.6)
+        scatter = plt.scatter(
+            z_points_full[:, 0], z_points_full[:, 1], c=labels, cmap="tab10", alpha=0.6
+        )
         plt.colorbar(scatter, label="Digit")
         plt.title("Latent Space Visualization")
         plt.xlabel("z[0]")
