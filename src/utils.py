@@ -1,3 +1,6 @@
+import matplotlib as mpl
+
+mpl.use("Agg")  # Use the 'Agg' backend (non-interactive) to fix the error
 import matplotlib.pyplot as plt
 import numpy as np
 import torch
