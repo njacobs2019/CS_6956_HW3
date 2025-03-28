@@ -1,25 +1,30 @@
 import time
 from pathlib import Path
+from typing import Callable, Optional
 
 import torch
-from torch import nn, optim
+from comet_ml import Experiment
+from torch import Tensor, nn, optim
+from torch.optim import Optimizer
 from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader
 
 from .utils import save_model, save_reconstructions
 
+VaeLossFunctionType = Callable[[Tensor, Tensor, Tensor, Tensor], tuple[Tensor, Tensor, Tensor]]
+
 
 def train_epoch(
     model: nn.Module,
     train_loader: DataLoader,
-    optimizer,
+    optimizer: Optimizer,
     device: torch.device,
-    loss_fn,
-    experiment=None,
+    loss_fn: VaeLossFunctionType,
+    experiment: Optional[Experiment] = None,
     step: int = 0,
     use_conv: bool = False,
     log_every: int = 10,
-):
+) -> tuple[float, float, float, int]:
     model.train()
     train_loss = 0
     train_bce = 0
@@ -60,11 +65,11 @@ def test_epoch(
     model: nn.Module,
     test_loader: DataLoader,
     device: torch.device,
-    loss_fn,
-    experiment,
+    loss_fn: VaeLossFunctionType,
+    experiment: Experiment,
     epoch: int,
     use_conv: bool = False,
-):
+) -> tuple[float, float, float]:
     model.eval()
     test_loss = 0
     test_bce = 0
@@ -100,13 +105,13 @@ def train_vae(
     train_loader: DataLoader,
     test_loader: DataLoader,
     device: torch.device,
-    loss_fn,
+    loss_fn: VaeLossFunctionType,
     epochs: int = 20,
     lr: float = 1e-3,
-    experiment=None,
+    experiment: Optional[Experiment] = None,
     checkpoint_name: str = "sample_model",
     log_every: int = 10,  # Log every `log_every` batches
-):
+) -> nn.Module:
     checkpoints_dir = "./checkpoints"
     if not Path(checkpoints_dir).exists():
         Path(checkpoints_dir).mkdir(parents=True, exist_ok=True)
