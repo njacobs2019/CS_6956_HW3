@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Literal
 
 import numpy as np
 import torch
@@ -8,6 +9,7 @@ from torchvision import transforms
 from torchvision.datasets import MNIST
 
 DS_ARRAYS = tuple[tuple[NDArray, NDArray], tuple[NDArray, NDArray]]
+
 
 np.random.seed(0)
 
@@ -75,15 +77,21 @@ class ConditionalMNIST(Dataset):
         return image, label_onehot, label
 
 
-def get_dataloaders(batch_size=128, num_workers=4):
+def get_dataloaders(
+    batch_size=128, num_workers=4, dataset_name: Literal["mnist", "synthetic"] = "mnist"
+):
     transform = transforms.Compose(
         [
             transforms.ToTensor(),
         ]
     )
 
-    train_dataset = ConditionalMNIST(train=True, transform=transform, download=True)
-    test_dataset = ConditionalMNIST(train=False, transform=transform, download=True)
+    if dataset_name == "mnist":
+        train_dataset = ConditionalMNIST(train=True, transform=transform, download=True)
+        test_dataset = ConditionalMNIST(train=False, transform=transform, download=True)
+    elif dataset_name == "synthetic":
+        synth_data = get_synth_data_arrays()
+        train_dataset, test_dataset = get_synth_ds(synth_data)
 
     train_loader = DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True
