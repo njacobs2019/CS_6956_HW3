@@ -2,22 +2,23 @@ import time
 from pathlib import Path
 
 import torch
-from torch import optim
+from torch import nn, optim
 from torch.optim.lr_scheduler import StepLR
+from torch.utils.data import DataLoader
 
 from .utils import save_model, save_reconstructions
 
 
 def train_epoch(
-    model,
-    train_loader,
+    model: nn.Module,
+    train_loader: DataLoader,
     optimizer,
-    device,
+    device: torch.device,
     loss_fn,
     experiment=None,
-    step=0,
-    use_conv=False,
-    log_every=10,
+    step: int = 0,
+    use_conv: bool = False,
+    log_every: int = 10,
 ):
     model.train()
     train_loss = 0
@@ -55,7 +56,15 @@ def train_epoch(
     )
 
 
-def test_epoch(model, test_loader, device, loss_fn, experiment, epoch, use_conv=False):
+def test_epoch(
+    model: nn.Module,
+    test_loader: DataLoader,
+    device: torch.device,
+    loss_fn,
+    experiment,
+    epoch: int,
+    use_conv: bool = False,
+):
     model.eval()
     test_loss = 0
     test_bce = 0
@@ -87,24 +96,24 @@ def test_epoch(model, test_loader, device, loss_fn, experiment, epoch, use_conv=
 
 
 def train_vae(
-    model,
-    train_loader,
-    test_loader,
-    device,
+    model: nn.Module,
+    train_loader: DataLoader,
+    test_loader: DataLoader,
+    device: torch.device,
     loss_fn,
-    epochs=20,
-    lr=1e-3,
+    epochs: int = 20,
+    lr: float = 1e-3,
     experiment=None,
-    checkpoint_name="sample_model",
-    log_every=10,  # Log every `log_every` batches
+    checkpoint_name: str = "sample_model",
+    log_every: int = 10,  # Log every `log_every` batches
 ):
     checkpoints_dir = "./checkpoints"
     if not Path(checkpoints_dir).exists():
         Path(checkpoints_dir).mkdir(parents=True, exist_ok=True)
 
-    figures_dir = "./figures"
-    if not Path(figures_dir, checkpoint_name).exists():
-        figures_dir = Path(figures_dir) / checkpoint_name
+    figures_dir_str = "./figures"
+    figures_dir = Path(figures_dir_str) / checkpoint_name
+    if not Path(figures_dir_str, checkpoint_name).exists():
         Path(figures_dir).mkdir(parents=True, exist_ok=True)
 
     print(f"Model architecture:\n{model}")
@@ -126,7 +135,7 @@ def train_vae(
     for epoch in range(1, epochs + 1):
         # Training
         train_loss, train_bce, train_kld, step = train_epoch(
-            model, train_loader, optimizer, device, loss_fn, experiment, step, log_every
+            model, train_loader, optimizer, device, loss_fn, experiment, step, log_every=log_every
         )
 
         # Validation
