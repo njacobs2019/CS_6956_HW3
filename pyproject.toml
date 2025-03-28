@@ -2,7 +2,7 @@
 disable_error_code = ["import-untyped"]
 
 [tool.ruff]
-line-length = 88
+line-length = 100
 indent-width = 4
 respect-gitignore = true
 exclude = [
