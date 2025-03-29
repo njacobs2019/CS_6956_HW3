@@ -87,6 +87,7 @@ def main(args):
         checkpoint_name=experiment_name,
         log_every=5,  # comet log every 10 batches
         save_reconstructions_flag=False,
+        scheduler_steps=1_000_000,
     )
 
     return model
