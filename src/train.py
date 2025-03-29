@@ -6,7 +6,6 @@ import torch
 from comet_ml import Experiment
 from torch import Tensor, nn, optim
 from torch.optim import Optimizer
-from torch.optim.lr_scheduler import StepLR
 from torch.utils.data import DataLoader
 
 from .utils import save_model, save_reconstructions
@@ -143,7 +142,14 @@ def train_vae(  # noqa: C901
     for epoch in range(1, epochs + 1):
         # Training
         train_loss, train_bce, train_kld, step = train_epoch(
-            model, train_loader, optimizer, device, loss_fn, experiment, step, log_every=log_every  # noqa: E501
+            model,
+            train_loader,
+            optimizer,
+            device,
+            loss_fn,
+            experiment,
+            step,
+            log_every=log_every,  # noqa: E501
         )
 
         # Validation
