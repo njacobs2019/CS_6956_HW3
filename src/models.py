@@ -1,3 +1,5 @@
+from typing import Literal
+
 import torch
 import torch.nn.functional as F
 from torch import Tensor, nn
@@ -261,3 +263,36 @@ class SyntheticVAE(nn.Module):
         x_recon = self.decode(z, c)
 
         return x_recon, mu, logvar
+
+    def forward_expected(self, x: Tensor, c: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+        # Unlike the forward pass uses expectation of normal
+        # Encode
+        mu, logvar = self.encode(x, c)
+
+        # Reparameterize
+        z = mu
+
+        # Decode
+        x_recon = self.decode(z, c)
+
+        return x_recon, mu, logvar
+
+    def sample(self, c: Literal[0, 1]) -> Tensor:
+        z = torch.randn((1, self.latent_dim))
+        c_tensor = torch.tensor(c, dtype=torch.float32).reshape(1, 1)
+
+        self.eval()
+        with torch.no_grad():
+            x_recon = self.decode(z, c_tensor)
+        return x_recon
+
+    def sample_expectation(self, c: Literal[0, 1]) -> Tensor:
+        """Returns expectation of a given class"""
+
+        z = torch.zeros((1, self.latent_dim))
+        c_tensor = torch.tensor(c, dtype=torch.float32).reshape(1, 1)
+
+        self.eval()
+        with torch.no_grad():
+            x_recon = self.decode(z, c_tensor)
+        return x_recon

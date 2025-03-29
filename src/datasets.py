@@ -17,7 +17,7 @@ np.random.seed(0)
 
 
 def get_synth_data_arrays() -> DS_ARRAYS:
-    n = 1000
+    n = 10000
 
     mean1 = np.array([1.0, 5.0])
     sd1 = np.array([0.7, 0.3])

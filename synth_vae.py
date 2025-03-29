@@ -14,31 +14,37 @@ load_dotenv()
 COMET_API_KEY = os.getenv("COMET_API_KEY")
 
 
-def synth_loss_function(
-    recon_x: Tensor, x: Tensor, mu: Tensor, logvar: Tensor, beta: float | None = 1.0
-) -> tuple[Tensor, Tensor, Tensor]:
-    # MSE Loss
-    MSE = F.mse_loss(recon_x, x, reduction="mean")
+def get_synth_loss_function(beta: float | None = 1.0):
+    def synth_loss_function(
+        recon_x: Tensor, x: Tensor, mu: Tensor, logvar: Tensor
+    ) -> tuple[Tensor, Tensor, Tensor]:
+        # MSE Loss
+        MSE = F.mse_loss(recon_x, x, reduction="mean") * x.shape[0]
 
-    # KL Divergence
-    KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
+        # KL Divergence
+        KLD = -0.5 * torch.sum(1 + logvar - mu.pow(2) - logvar.exp())
 
-    # Total loss
-    return MSE + beta * KLD, MSE, KLD
+        # Total loss
+        return MSE + beta * KLD, MSE, KLD
+
+    return synth_loss_function
 
 
-if __name__ == "__main__":
+def get_args():
     import argparse
 
     parser = argparse.ArgumentParser(description="Train the synthetic VAE.")
     parser.add_argument("--latent-dim", type=int, default=2, help="Dimension of latent space")
-    parser.add_argument("--hidden-dim", type=int, default=512, help="Dimension of hidden layers")
+    parser.add_argument("--hidden-dim", type=int, default=64, help="Dimension of hidden layers")
     parser.add_argument("--batch-size", type=int, default=128, help="Batch size for training")
     parser.add_argument("--epochs", type=int, default=20, help="Number of epochs to train")
     parser.add_argument("--lr", type=float, default=3e-4, help="Learning rate")
+    parser.add_argument("--beta", type=float, default=1.0, help="Beta hparam")
 
-    args = parser.parse_args()
+    return parser.parse_args()
 
+
+def main(args):
     # Get data loaders
     train_loader, test_loader = get_dataloaders(
         batch_size=args.batch_size, dataset_name="synthetic"
@@ -52,7 +58,7 @@ if __name__ == "__main__":
     experiment = None
     experiment_name = (
         f"SynthVAE_hidden_dim_{args.hidden_dim}_"
-        f"latent_dim_{args.latent_dim}_batch_size_{args.batch_size}"
+        f"latent_dim_{args.latent_dim}_batch_size_{args.batch_size}_beta{args.beta}"
     )
     if COMET_API_KEY:
         experiment = comet_ml.start(
@@ -74,11 +80,19 @@ if __name__ == "__main__":
         train_loader=train_loader,
         test_loader=test_loader,
         device=device,
-        loss_fn=synth_loss_function,
+        loss_fn=get_synth_loss_function(args.beta),
         epochs=args.epochs,
         lr=args.lr,
         experiment=experiment,
         checkpoint_name=experiment_name,
-        log_every=10,  # comet log every 10 batches
+        log_every=5,  # comet log every 10 batches
         save_reconstructions_flag=False,
+        scheduler_steps=1_000_000,
     )
+
+    return model
+
+
+if __name__ == "__main__":
+    args = get_args()
+    main(args)

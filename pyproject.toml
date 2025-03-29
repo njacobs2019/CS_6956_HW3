@@ -49,11 +49,6 @@ select = [
     "PERF", # perflint (for performance)
 
     "PTH", # flake8-use-pathlib
-
-# "ANN", # force type annotations
-# "N", # pep8-naming
-# "D", # pydocstyle
-# "DOC", # pydoclint
 ]
 
 ignore = ["S101", "NPY002"]

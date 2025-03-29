@@ -137,6 +137,7 @@ def train_vae(
     checkpoint_name: str = "sample_model",
     log_every: int = 10,  # Log every `log_every` batches
     save_reconstructions_flag: bool = True,
+    scheduler_steps: int = 10,
 ) -> nn.Module:
     checkpoints_dir = "./checkpoints"
     if not Path(checkpoints_dir).exists():
@@ -156,7 +157,7 @@ def train_vae(
 
     # Set up optimizer
     optimizer = optim.Adam(model.parameters(), lr=lr)
-    scheduler = StepLR(optimizer, step_size=10, gamma=0.5)
+    scheduler = StepLR(optimizer, step_size=scheduler_steps, gamma=0.5)
 
     # Training loop
     best_test_loss = float("inf")
