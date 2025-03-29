@@ -1,10 +1,16 @@
 import torch
 import torch.nn.functional as F
-from torch import nn
+from torch import Tensor, nn
 
 
 class ConditionalVAE(nn.Module):
-    def __init__(self, input_dim=784, condition_dim=10, hidden_dim=512, latent_dim=2):
+    def __init__(
+        self,
+        input_dim: int = 784,
+        condition_dim: int = 10,
+        hidden_dim: int = 512,
+        latent_dim: int = 2,
+    ) -> None:
         super(ConditionalVAE, self).__init__()
         self.input_dim = input_dim
         self.latent_dim = latent_dim
@@ -19,7 +25,7 @@ class ConditionalVAE(nn.Module):
         self.fc2 = nn.Linear(latent_dim + condition_dim, hidden_dim)
         self.fc3 = nn.Linear(hidden_dim, input_dim)
 
-    def encode(self, x, c):
+    def encode(self, x: Tensor, c: Tensor) -> tuple[Tensor, Tensor]:
         # Flatten the input
         x = x.view(-1, self.input_dim)
 
@@ -30,18 +36,18 @@ class ConditionalVAE(nn.Module):
         logvar = self.fc_logvar(h)
         return mu, logvar
 
-    def reparameterize(self, mu, logvar):
+    def reparameterize(self, mu: Tensor, logvar: Tensor) -> Tensor:
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
         return mu + eps * std
 
-    def decode(self, z, c):
+    def decode(self, z: Tensor, c: Tensor) -> Tensor:
         # Concatenate latent and condition
         z = torch.cat([z, c], dim=1)
         h = F.relu(self.fc2(z))
         return torch.sigmoid(self.fc3(h))  # Sigmoid to output probabilities for binary data
 
-    def forward(self, x, c):
+    def forward(self, x: Tensor, c: Tensor) -> tuple[Tensor, Tensor, Tensor]:
         # Encode
         mu, logvar = self.encode(x, c)
 
@@ -112,7 +118,7 @@ class BigConditionalVAE(nn.Module):
         return x_recon, mu, logvar
 
 class ConvolutionalVAE(nn.Module):
-    def __init__(self, condition_dim=10, hidden_dim=256, latent_dim=2):
+    def __init__(self, condition_dim: int = 10, hidden_dim: int = 256, latent_dim: int = 2) -> None:
         super(ConvolutionalVAE, self).__init__()
         self.latent_dim = latent_dim
         self.condition_dim = condition_dim
@@ -151,7 +157,7 @@ class ConvolutionalVAE(nn.Module):
             nn.Sigmoid(),
         )
 
-    def encode(self, x, c):
+    def encode(self, x: Tensor, c: Tensor) -> tuple[Tensor, Tensor]:
         # Process image through convolutions
         x = self.encoder_conv(x)
 
@@ -170,12 +176,12 @@ class ConvolutionalVAE(nn.Module):
 
         return mu, logvar
 
-    def reparameterize(self, mu, logvar):
+    def reparameterize(self, mu: Tensor, logvar: Tensor) -> Tensor:
         std = torch.exp(0.5 * logvar)
         eps = torch.randn_like(std)
         return mu + eps * std
 
-    def decode(self, z, c):
+    def decode(self, z: Tensor, c: Tensor) -> Tensor:
         # Embed condition
         c = F.relu(self.condition_embedding(c))
 
@@ -188,7 +194,7 @@ class ConvolutionalVAE(nn.Module):
         # Process through deconvolutions
         return self.decoder_conv(h.view(-1, 64, 7, 7))  # Output size is 1 channel, 28x28 image
 
-    def forward(self, x, c):
+    def forward(self, x: Tensor, c: Tensor) -> tuple[Tensor, Tensor, Tensor]:
         # Encode
         mu, logvar = self.encode(x, c)
 

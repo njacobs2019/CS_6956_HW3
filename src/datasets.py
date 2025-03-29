@@ -1,9 +1,10 @@
 from pathlib import Path
-from typing import Literal
+from typing import Any, Callable, Literal, Optional
 
 import numpy as np
 import torch
 from numpy.typing import NDArray
+from torch import Tensor
 from torch.utils.data import DataLoader, Dataset, TensorDataset
 from torchvision import transforms
 from torchvision.datasets import MNIST
@@ -60,16 +61,22 @@ def get_synth_ds(ds_arrays: DS_ARRAYS) -> tuple[Dataset, Dataset]:
 
 
 class ConditionalMNIST(Dataset):
-    def __init__(self, root="./mnist-data", train=True, transform=None, download=True):
+    def __init__(
+        self,
+        root: str = "./mnist-data",
+        train: bool = True,
+        transform: Optional[Callable] = None,
+        download: bool = True,
+    ) -> None:
         if download and Path(root).exists():
             print(f"{root} already exists. Setting download to False.")
             download = False
         self.mnist = MNIST(root=root, train=train, transform=transform, download=download)
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.mnist)
 
-    def __getitem__(self, idx):
+    def __getitem__(self, idx: int) -> tuple[Tensor, Tensor, Any]:
         image, label = self.mnist[idx]
         # Convert label to one-hot encoding
         label_onehot = torch.zeros(10)
@@ -78,8 +85,10 @@ class ConditionalMNIST(Dataset):
 
 
 def get_dataloaders(
-    batch_size=128, num_workers=4, dataset_name: Literal["mnist", "synthetic"] = "mnist"
-):
+    batch_size: int = 128,
+    num_workers: int = 4,
+    dataset_name: Literal["mnist", "synthetic"] = "mnist",
+) -> tuple[DataLoader, DataLoader]:
     transform = transforms.Compose(
         [
             transforms.ToTensor(),

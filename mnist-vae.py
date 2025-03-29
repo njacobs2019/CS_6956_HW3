@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 import comet_ml
 import torch
@@ -15,8 +16,8 @@ COMET_API_KEY = os.getenv("COMET_API_KEY")
 
 
 def vae_loss_function(
-    recon_x: Tensor, x: Tensor, mu: Tensor, logvar: Tensor, beta: float = 1.0
-) -> Tensor:
+    recon_x: Tensor, x: Tensor, mu: Tensor, logvar: Tensor, beta: Optional[float] = 1.0
+) -> tuple[Tensor, Tensor, Tensor]:
     # Binary Cross Entropy loss
     # for binary data (e.g., MNIST images)
     BCE = F.binary_cross_entropy(recon_x, x.view(-1, 784), reduction="sum")
@@ -29,8 +30,8 @@ def vae_loss_function(
 
 
 def conv_vae_loss_function(
-    recon_x: Tensor, x: Tensor, mu: Tensor, logvar: Tensor, beta: float = 1.0
-) -> Tensor:
+    recon_x: Tensor, x: Tensor, mu: Tensor, logvar: Tensor, beta: Optional[float] = 1.0
+) -> tuple[Tensor, Tensor, Tensor]:
     # Binary Cross Entropy loss
     BCE = F.binary_cross_entropy(recon_x, x, reduction="mean")
 
@@ -103,6 +104,9 @@ if __name__ == "__main__":
         epochs=args.epochs,
         lr=args.lr,
         experiment=experiment,
-        checkpoint_name=f"mnist_{'conv' if args.use_conv else ''}big_latent{args.latent_dim}_hidden{args.hidden_dim}",  # noqa: E501
+        checkpoint_name=(
+            f"mnist_{'conv' if args.use_conv else ''}"
+            f"big_latent{args.latent_dim}_hidden{args.hidden_dim}"
+        ),
         log_every=10,  # comet log every 10 batches
     )
