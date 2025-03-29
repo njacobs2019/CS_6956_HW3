@@ -46,11 +46,11 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser(description="Train a Conditional VAE on MNIST.")
-    parser.add_argument("--latent-dim", type=int, default=2, help="Dimension of latent space")
+    parser.add_argument("--latent-dim", type=int, default=25, help="Dimension of latent space")
     parser.add_argument("--hidden-dim", type=int, default=512, help="Dimension of hidden layers")
     parser.add_argument("--batch-size", type=int, default=128, help="Batch size for training")
-    parser.add_argument("--epochs", type=int, default=2, help="Number of epochs to train")
-    parser.add_argument("--lr", type=float, default=1e-3, help="Learning rate")
+    parser.add_argument("--epochs", type=int, default=50, help="Number of epochs to train")
+    parser.add_argument("--lr", type=float, default=5e-4, help="Learning rate")
     parser.add_argument("--use-conv", action="store_true", help="Use convolutional architecture")
 
     args = parser.parse_args()
@@ -66,7 +66,7 @@ if __name__ == "__main__":
         ).to(device)
     else:
         # model = ConditionalVAE(  # noqa: ERA001
-        #     input_dim=784, condition_dim=10, hidden_dim=args.hidden_dim, latent_dim=args.latent_dim
+        #     input_dim=784, condition_dim=10, hidden_dim=args.hidden_dim, latent_dim=args.latent_dim  # noqa: E501
         # ).to(device)
         model = BigConditionalVAE(
             input_dim=784, condition_dim=10, hidden_dim=args.hidden_dim, latent_dim=args.latent_dim
