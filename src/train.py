@@ -5,7 +5,7 @@ from pathlib import Path
 import torch
 from comet_ml import Experiment
 from torch import Tensor, nn, optim
-from torch.optim import Optimizer, StepLR
+from torch.optim import Optimizer
 from torch.utils.data import DataLoader
 
 from .utils import save_model, save_reconstructions
@@ -71,7 +71,6 @@ def test_epoch(
     loss_fn: VaeLossFunctionType,
     experiment: Experiment,
     epoch: int,
-    use_conv: bool = False,
 ) -> tuple[float, float, float]:
     model.eval()
     test_loss = 0
@@ -116,7 +115,6 @@ def train_vae(  # noqa: C901
     checkpoint_name: str = "sample_model",
     log_every: int = 10,  # Log every `log_every` batches
     save_reconstructions_flag: bool = True,
-    scheduler_steps: int = 10,
 ) -> nn.Module:
     checkpoints_dir = "./checkpoints"
     if not Path(checkpoints_dir).exists():
@@ -136,7 +134,6 @@ def train_vae(  # noqa: C901
 
     # Set up optimizer
     optimizer = optim.Adam(model.parameters(), lr=lr)
-    scheduler = StepLR(optimizer, step_size=scheduler_steps, gamma=0.5)
 
     # Training loop
     best_test_loss = float("inf")
@@ -198,11 +195,6 @@ def train_vae(  # noqa: C901
 
                 if experiment:
                     experiment.log_image(recon_path, name=f"reconstruction_epoch{epoch}")
-
-        # Update learning rate
-        # scheduler.step()
-        # if experiment:
-        #     experiment.log_metric("learning_rate", scheduler.get_last_lr()[0], epoch=epoch)
 
     end_time = time.time()
     train_time = end_time - start_time

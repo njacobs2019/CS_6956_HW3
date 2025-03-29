@@ -51,4 +51,4 @@ select = [
     "PTH", # flake8-use-pathlib
 ]
 
-ignore = ["S101", "NPY002"]
+ignore = ["S101", "NPY002", "RET504"]

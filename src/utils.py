@@ -169,7 +169,6 @@ def visualize_latent_space(
     dataloader: DataLoader,
     device: torch.device,
     filepath: str,
-    use_conv: bool = False,
 ) -> None:
     model.eval()
     with torch.no_grad():
