@@ -47,10 +47,33 @@ def train_epoch(
 
         # Log metrics to Comet ML
         # Only log every `log_every` batches to reduce the number of logs
+        # if experiment and batch_idx % log_every == 0:
+        #     experiment.log_metric("train_loss", loss.item(), step=step)
+        #     experiment.log_metric("train_bce", bce.item(), step=step)
+        #     experiment.log_metric("train_kld", kld.item(), step=step)
+        # step += 1
+        
+        # use averaged over full dataset size
+        # if experiment and batch_idx % log_every == 0:
+        #     experiment.log_metrics(
+        #         {
+        #             "train_loss": loss.item() / len(train_loader.dataset),
+        #             "train_bce": bce.item() / len(train_loader.dataset),
+        #             "train_kld": kld.item() / len(train_loader.dataset),
+        #         },
+        #         step=step,
+        #     )
+        # step += 1
+        
         if experiment and batch_idx % log_every == 0:
-            experiment.log_metric("train_loss", loss.item(), step=step)
-            experiment.log_metric("train_bce", bce.item(), step=step)
-            experiment.log_metric("train_kld", kld.item(), step=step)
+            experiment.log_metrics(
+                {
+                    "train_loss": loss.item() / data.size(0),
+                    "train_bce": bce.item() / data.size(0),
+                    "train_kld": kld.item() / data.size(0),
+                },
+                step=step,
+            )
         step += 1
 
     return (
@@ -181,9 +204,10 @@ def train_vae(
                 device,
                 recon_path,
             )
-
+            """
             if experiment:
                 experiment.log_image(recon_path, name=f"reconstruction_epoch{epoch}")
+            """
 
         # Update learning rate
         scheduler.step()

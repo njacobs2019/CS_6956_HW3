@@ -59,6 +59,63 @@ class ConditionalVAE(nn.Module):
 
         return x_recon, mu, logvar
 
+class BigConditionalVAE(nn.Module):
+    def __init__(self, input_dim=784, condition_dim=10, hidden_dim=512, latent_dim=2):
+        super(BigConditionalVAE, self).__init__()
+        self.input_dim = input_dim
+        self.latent_dim = latent_dim
+        self.condition_dim = condition_dim
+
+        # Encoder with additional layer
+        self.fc1 = nn.Linear(input_dim + condition_dim, hidden_dim)
+        self.fc1_bn = nn.BatchNorm1d(hidden_dim)
+        self.fc1_2 = nn.Linear(hidden_dim, hidden_dim // 2)  # Additional layer
+        self.fc1_2_bn = nn.BatchNorm1d(hidden_dim // 2)
+        self.fc_mu = nn.Linear(hidden_dim // 2, latent_dim)
+        self.fc_logvar = nn.Linear(hidden_dim // 2, latent_dim)
+
+        # Decoder with additional layer
+        self.fc2 = nn.Linear(latent_dim + condition_dim, hidden_dim // 2)
+        self.fc2_bn = nn.BatchNorm1d(hidden_dim // 2)
+        self.fc2_2 = nn.Linear(hidden_dim // 2, hidden_dim)  # Additional layer
+        self.fc2_2_bn = nn.BatchNorm1d(hidden_dim)
+        self.fc3 = nn.Linear(hidden_dim, input_dim)
+
+    def encode(self, x, c):
+        # Flatten the input
+        x = x.view(-1, self.input_dim)
+
+        # Concatenate input and condition
+        x = torch.cat([x, c], dim=1)
+        h = F.relu(self.fc1_bn(self.fc1(x)))
+        h = F.relu(self.fc1_2_bn(self.fc1_2(h)))
+        mu = self.fc_mu(h)
+        logvar = self.fc_logvar(h)
+        return mu, logvar
+
+    def reparameterize(self, mu, logvar):
+        std = torch.exp(0.5 * logvar)
+        eps = torch.randn_like(std)
+        return mu + eps * std
+
+    def decode(self, z, c):
+        # Concatenate latent and condition
+        z = torch.cat([z, c], dim=1)
+        h = F.relu(self.fc2_bn(self.fc2(z)))
+        h = F.relu(self.fc2_2_bn(self.fc2_2(h)))
+        return torch.sigmoid(self.fc3(h))  # Sigmoid for binary data
+
+    def forward(self, x, c):
+        # Encode
+        mu, logvar = self.encode(x, c)
+
+        # Reparameterize
+        z = self.reparameterize(mu, logvar)
+
+        # Decode
+        x_recon = self.decode(z, c)
+
+        return x_recon, mu, logvar
 
 class ConvolutionalVAE(nn.Module):
     def __init__(self, condition_dim: int = 10, hidden_dim: int = 256, latent_dim: int = 2) -> None:
