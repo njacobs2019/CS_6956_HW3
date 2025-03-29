@@ -59,6 +59,7 @@ class ConditionalVAE(nn.Module):
 
         return x_recon, mu, logvar
 
+
 class BigConditionalVAE(nn.Module):
     def __init__(self, input_dim=784, condition_dim=10, hidden_dim=512, latent_dim=2):
         super(BigConditionalVAE, self).__init__()
@@ -116,6 +117,7 @@ class BigConditionalVAE(nn.Module):
         x_recon = self.decode(z, c)
 
         return x_recon, mu, logvar
+
 
 class ConvolutionalVAE(nn.Module):
     def __init__(self, condition_dim: int = 10, hidden_dim: int = 256, latent_dim: int = 2) -> None:

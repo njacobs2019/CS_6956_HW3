@@ -53,7 +53,7 @@ def train_epoch(
         #     experiment.log_metric("train_bce", bce.item(), step=step)
         #     experiment.log_metric("train_kld", kld.item(), step=step)
         # step += 1
-        
+
         # use averaged over full dataset size
         # if experiment and batch_idx % log_every == 0:
         #     experiment.log_metrics(
@@ -65,7 +65,7 @@ def train_epoch(
         #         step=step,
         #     )
         # step += 1
-        
+
         if experiment and batch_idx % log_every == 0:
             experiment.log_metrics(
                 {
