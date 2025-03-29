@@ -61,8 +61,8 @@ class ConditionalVAE(nn.Module):
 
 
 class BigConditionalVAE(nn.Module):
-    def __init__(self, input_dim=784, condition_dim=10, hidden_dim=512, latent_dim=2):
-        super(BigConditionalVAE, self).__init__()
+    def __init__(self, input_dim=784, condition_dim=10, hidden_dim=512, latent_dim=2) -> None:
+        super().__init__()
         self.input_dim = input_dim
         self.latent_dim = latent_dim
         self.condition_dim = condition_dim
