@@ -1,6 +1,6 @@
 import time
+from collections.abc import Callable
 from pathlib import Path
-from typing import Callable, Optional
 
 import torch
 from comet_ml import Experiment
@@ -19,7 +19,7 @@ def train_epoch(
     optimizer: Optimizer,
     device: torch.device,
     loss_fn: VaeLossFunctionType,
-    experiment: Optional[Experiment] = None,
+    experiment: Experiment | None = None,
     step: int = 0,
     use_conv: bool = False,  # noqa: ARG001
     log_every: int = 10,
@@ -29,7 +29,8 @@ def train_epoch(
     train_bce = 0
     train_kld = 0
 
-    for batch_idx, (data, condition, _) in enumerate(train_loader):
+    for batch_idx, batch in enumerate(train_loader):
+        data, condition = batch[0], batch[1]
         data, condition = data.to(device), condition.to(device)
         optimizer.zero_grad()
 
@@ -78,7 +79,8 @@ def test_epoch(
     test_kld = 0
 
     with torch.no_grad():
-        for batch_idx, (data, condition, _) in enumerate(test_loader):
+        for batch_idx, batch in enumerate(test_loader):
+            data, condition = batch[0], batch[1]
             data, condition = data.to(device), condition.to(device)
 
             recon_batch, mu, logvar = model(data, condition)
@@ -110,9 +112,10 @@ def train_vae(  # noqa: C901
     loss_fn: VaeLossFunctionType,
     epochs: int = 20,
     lr: float = 1e-3,
-    experiment: Optional[Experiment] = None,
+    experiment: Experiment | None = None,
     checkpoint_name: str = "sample_model",
     log_every: int = 10,  # Log every `log_every` batches
+    save_reconstructions_flag: bool = True,
 ) -> nn.Module:
     checkpoints_dir = "./checkpoints"
     if not Path(checkpoints_dir).exists():
@@ -182,18 +185,18 @@ def train_vae(  # noqa: C901
                 experiment.log_model("vae_best_model", model_path)
             """
 
-            recon_path = f"{figures_dir}/recon_best_epoch{epoch}.png"
-            # Save reconstructions
-            save_reconstructions(
-                model,
-                test_loader,
-                device,
-                recon_path,
-            )
-            """
-            if experiment:
-                experiment.log_image(recon_path, name=f"reconstruction_epoch{epoch}")
-            """
+            if save_reconstructions_flag:
+                recon_path = f"{figures_dir}/recon_best_epoch{epoch}.png"
+
+                save_reconstructions(
+                    model,
+                    test_loader,
+                    device,
+                    recon_path,
+                )
+
+                if experiment:
+                    experiment.log_image(recon_path, name=f"reconstruction_epoch{epoch}")
 
         # Update learning rate
         # scheduler.step()

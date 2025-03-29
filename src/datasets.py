@@ -1,5 +1,6 @@
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable, Literal, Optional
+from typing import Any, Literal
 
 import numpy as np
 import torch
@@ -35,6 +36,7 @@ def get_synth_data_arrays() -> DS_ARRAYS:
     )
 
     data = np.vstack((data1, data2))
+    data = data.astype(np.float32)
     np.random.shuffle(data)
 
     n_train = int(n * 0.8)
@@ -43,10 +45,10 @@ def get_synth_data_arrays() -> DS_ARRAYS:
     test = data[n_train:]
 
     X_train = train[:, :2]
-    y_train = train[:, -1]
+    y_train = train[:, -1].reshape(-1, 1)
 
     X_test = test[:, :2]
-    y_test = test[:, -1]
+    y_test = test[:, -1].reshape(-1, 1)
 
     return (X_train, y_train), (X_test, y_test)
 
@@ -65,7 +67,7 @@ class ConditionalMNIST(Dataset):
         self,
         root: str = "./mnist-data",
         train: bool = True,
-        transform: Optional[Callable] = None,
+        transform: Callable | None = None,
         download: bool = True,
     ) -> None:
         if download and Path(root).exists():
