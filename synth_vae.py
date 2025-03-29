@@ -30,7 +30,7 @@ def get_synth_loss_function(beta: float | None = 1.0):
     return synth_loss_function
 
 
-def main():
+def get_args():
     import argparse
 
     parser = argparse.ArgumentParser(description="Train the synthetic VAE.")
@@ -41,8 +41,10 @@ def main():
     parser.add_argument("--lr", type=float, default=3e-4, help="Learning rate")
     parser.add_argument("--beta", type=float, default=1.0, help="Beta hparam")
 
-    args = parser.parse_args()
+    return parser.parse_args()
 
+
+def main(args):
     # Get data loaders
     train_loader, test_loader = get_dataloaders(
         batch_size=args.batch_size, dataset_name="synthetic"
@@ -91,4 +93,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    args = get_args()
+    main(args)
