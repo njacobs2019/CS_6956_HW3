@@ -5,8 +5,7 @@ from pathlib import Path
 import torch
 from comet_ml import Experiment
 from torch import Tensor, nn, optim
-from torch.optim import Optimizer
-from torch.optim.lr_scheduler import StepLR
+from torch.optim import Optimizer, StepLR
 from torch.utils.data import DataLoader
 
 from .utils import save_model, save_reconstructions
@@ -22,7 +21,7 @@ def train_epoch(
     loss_fn: VaeLossFunctionType,
     experiment: Experiment | None = None,
     step: int = 0,
-    use_conv: bool = False,
+    use_conv: bool = False,  # noqa: ARG001
     log_every: int = 10,
 ) -> tuple[float, float, float, int]:
     model.train()
@@ -45,26 +44,6 @@ def train_epoch(
         train_loss += loss.item()
         train_bce += bce.item()
         train_kld += kld.item()
-
-        # Log metrics to Comet ML
-        # Only log every `log_every` batches to reduce the number of logs
-        # if experiment and batch_idx % log_every == 0:
-        #     experiment.log_metric("train_loss", loss.item(), step=step)
-        #     experiment.log_metric("train_bce", bce.item(), step=step)
-        #     experiment.log_metric("train_kld", kld.item(), step=step)
-        # step += 1
-
-        # use averaged over full dataset size
-        # if experiment and batch_idx % log_every == 0:
-        #     experiment.log_metrics(
-        #         {
-        #             "train_loss": loss.item() / len(train_loader.dataset),
-        #             "train_bce": bce.item() / len(train_loader.dataset),
-        #             "train_kld": kld.item() / len(train_loader.dataset),
-        #         },
-        #         step=step,
-        #     )
-        # step += 1
 
         if experiment and batch_idx % log_every == 0:
             experiment.log_metrics(
@@ -125,7 +104,7 @@ def test_epoch(
     return avg_test_loss, avg_test_bce, avg_test_kld
 
 
-def train_vae(
+def train_vae(  # noqa: C901
     model: nn.Module,
     train_loader: DataLoader,
     test_loader: DataLoader,
@@ -167,7 +146,14 @@ def train_vae(
     for epoch in range(1, epochs + 1):
         # Training
         train_loss, train_bce, train_kld, step = train_epoch(
-            model, train_loader, optimizer, device, loss_fn, experiment, step, log_every=log_every
+            model,
+            train_loader,
+            optimizer,
+            device,
+            loss_fn,
+            experiment,
+            step,
+            log_every=log_every,  # noqa: E501
         )
 
         # Validation
@@ -214,9 +200,9 @@ def train_vae(
                     experiment.log_image(recon_path, name=f"reconstruction_epoch{epoch}")
 
         # Update learning rate
-        scheduler.step()
-        if experiment:
-            experiment.log_metric("learning_rate", scheduler.get_last_lr()[0], epoch=epoch)
+        # scheduler.step()
+        # if experiment:
+        #     experiment.log_metric("learning_rate", scheduler.get_last_lr()[0], epoch=epoch)
 
     end_time = time.time()
     train_time = end_time - start_time
