@@ -148,3 +148,57 @@ class ConvolutionalVAE(nn.Module):
         x_recon = self.decode(z, c)
 
         return x_recon, mu, logvar
+
+
+class SyntheticVAE(nn.Module):
+    def __init__(
+        self,
+        input_dim: int = 2,
+        condition_dim: int = 1,
+        hidden_dim: int = 64,
+        latent_dim: int = 2,
+    ) -> None:
+        super().__init__()
+        self.input_dim = input_dim
+        self.latent_dim = latent_dim
+        self.condition_dim = condition_dim
+
+        # Encoder
+        self.fc1 = nn.Linear(input_dim + condition_dim, hidden_dim)
+        self.fc_mu = nn.Linear(hidden_dim, latent_dim)
+        self.fc_logvar = nn.Linear(hidden_dim, latent_dim)
+
+        # Decoder
+        self.fc2 = nn.Linear(latent_dim + condition_dim, hidden_dim)
+        self.fc3 = nn.Linear(hidden_dim, input_dim)
+
+    def encode(self, x: Tensor, c: Tensor) -> tuple[Tensor, Tensor]:
+        # Concatenate input and condition
+        x = torch.cat([x, c], dim=1)
+        h = F.relu(self.fc1(x))
+        mu = self.fc_mu(h)
+        logvar = self.fc_logvar(h)
+        return mu, logvar
+
+    def reparameterize(self, mu: Tensor, logvar: Tensor) -> Tensor:
+        std = torch.exp(0.5 * logvar)
+        eps = torch.randn_like(std)
+        return mu + eps * std
+
+    def decode(self, z: Tensor, c: Tensor) -> Tensor:
+        # Concatenate latent and condition
+        z = torch.cat([z, c], dim=1)
+        h = F.relu(self.fc2(z))
+        return self.fc3(h)
+
+    def forward(self, x: Tensor, c: Tensor) -> tuple[Tensor, Tensor, Tensor]:
+        # Encode
+        mu, logvar = self.encode(x, c)
+
+        # Reparameterize
+        z = self.reparameterize(mu, logvar)
+
+        # Decode
+        x_recon = self.decode(z, c)
+
+        return x_recon, mu, logvar
