@@ -103,6 +103,9 @@ def get_dataloaders(
     elif dataset_name == "synthetic":
         synth_data = get_synth_data_arrays()
         train_dataset, test_dataset = get_synth_ds(synth_data)
+    else:
+        msg = f"dataset_name must be mnist or synthetic, not {dataset_name}"
+        raise ValueError(msg)
 
     train_loader = DataLoader(
         train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers, pin_memory=True

@@ -21,6 +21,7 @@ select = [
     
     "S", # flake8-bandit
     "BLE", # flake8-blind-except
+    "B", # flake8-bugbear
     "A", # flake8-builtins
     "COM818", # trailing-comma-on-bare-tuple
     "C4", # flake8-comprehensions
@@ -49,6 +50,7 @@ select = [
     "PERF", # perflint (for performance)
 
     "PTH", # flake8-use-pathlib
+    "RUF",
 ]
 
 ignore = ["S101", "NPY002", "RET504"]

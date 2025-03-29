@@ -64,9 +64,6 @@ if __name__ == "__main__":
             condition_dim=10, hidden_dim=args.hidden_dim, latent_dim=args.latent_dim
         ).to(device)
     else:
-        # model = ConditionalVAE(  # noqa: ERA001
-        #     input_dim=784, condition_dim=10, hidden_dim=args.hidden_dim, latent_dim=args.latent_dim  # noqa: E501
-        # ).to(device)
         model = BigConditionalVAE(
             input_dim=784, condition_dim=10, hidden_dim=args.hidden_dim, latent_dim=args.latent_dim
         ).to(device)

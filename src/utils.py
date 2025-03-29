@@ -46,11 +46,11 @@ def save_reconstructions(
     model.eval()
     with torch.no_grad():
         # Get a batch of data
-        data, condition, label = next(iter(dataloader))
+        data, condition, _label = next(iter(dataloader))
         data, condition = data.to(device), condition.to(device)
 
         # Get reconstructions
-        recon_batch, mu, logvar = model(data, condition)
+        recon_batch, _mu, _logvar = model(data, condition)
 
         # Reshape for visualization if using non-convolutional model
         if not use_conv:

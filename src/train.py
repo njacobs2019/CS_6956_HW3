@@ -21,7 +21,6 @@ def train_epoch(
     loss_fn: VaeLossFunctionType,
     experiment: Experiment | None = None,
     step: int = 0,
-    use_conv: bool = False,  # noqa: ARG001
     log_every: int = 10,
 ) -> tuple[float, float, float, int]:
     model.train()
@@ -78,7 +77,7 @@ def test_epoch(
     test_kld = 0
 
     with torch.no_grad():
-        for batch_idx, batch in enumerate(test_loader):
+        for batch in test_loader:
             data, condition = batch[0], batch[1]
             data, condition = data.to(device), condition.to(device)
 
@@ -103,7 +102,7 @@ def test_epoch(
     return avg_test_loss, avg_test_bce, avg_test_kld
 
 
-def train_vae(  # noqa: C901
+def train_vae(
     model: nn.Module,
     train_loader: DataLoader,
     test_loader: DataLoader,
@@ -150,7 +149,7 @@ def train_vae(  # noqa: C901
             loss_fn,
             experiment,
             step,
-            log_every=log_every,  # noqa: E501
+            log_every=log_every,
         )
 
         # Validation
@@ -177,11 +176,6 @@ def train_vae(  # noqa: C901
             best_test_loss = test_loss
             model_path = f"{checkpoints_dir}/{checkpoint_name}.pt"
             save_model(model, optimizer, epoch, test_loss, model_path)
-
-            """
-            if experiment:
-                experiment.log_model("vae_best_model", model_path)
-            """
 
             if save_reconstructions_flag:
                 recon_path = f"{figures_dir}/recon_best_epoch{epoch}.png"
