@@ -45,7 +45,7 @@ if __name__ == "__main__":
     )
 
     # Initialize model
-    device = torch.device("cuda1")
+    device = torch.device("cuda:1")
     model = SyntheticVAE(hidden_dim=args.hidden_dim, latent_dim=args.latent_dim).to(device)
 
     # Initialize Comet experiment
@@ -80,4 +80,5 @@ if __name__ == "__main__":
         experiment=experiment,
         checkpoint_name=experiment_name,
         log_every=10,  # comet log every 10 batches
+        save_reconstructions_flag=False,
     )
